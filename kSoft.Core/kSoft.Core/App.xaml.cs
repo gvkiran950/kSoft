@@ -1,8 +1,5 @@
 ﻿using kSoft.Core.Views;
-using System;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-
 namespace kSoft.Core
 {
     public partial class App : Application
@@ -10,6 +7,7 @@ namespace kSoft.Core
         public App()
         {
             InitializeComponent();
+           // AppResources.Culture = CrossMultilingual.Current.DeviceCultureInfo;
             MainPage = new LoginPage();
         }
 

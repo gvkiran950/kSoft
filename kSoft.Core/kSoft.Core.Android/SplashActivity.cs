@@ -14,8 +14,8 @@ using Android.Widget;
 namespace kSoft.Core.Droid
 {
     [Activity(Label = "kSoft.Core", 
-        Icon = "@mipmap/icon", 
-        Theme = "@style/SplashTheme", 
+        Icon = "@mipmap/icon",
+        Theme = "@style/SplashTheme",
         MainLauncher = true, 
         NoHistory =true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
@@ -24,13 +24,15 @@ namespace kSoft.Core.Droid
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            CallMainActivity();           
+            CallMainActivity();
         }
 
        private void CallMainActivity()
         {
-            var intent = new Intent(this, typeof(MainActivity));
-            StartActivity(intent);
+            using (Intent intent = new Intent(this, typeof(MainActivity)))
+            {
+                StartActivity(intent);
+            }
         }
     }
 }

@@ -4,12 +4,32 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             xmlns:viewModel ="clr-namespace:kSoft.Core.ViewModels"
              x:Class="kSoft.Core.Views.LoginPage">
+    <ContentPage.BindingContext>
+        <viewModel:LoginViewModel/>
+    </ContentPage.BindingContext>
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
+        <StackLayout  VerticalOptions="StartAndExpand">
+
+            <Image Source="Header.png"/>
+            <Button Text="test"  
+                     VerticalOptions="End"
+                        AbsoluteLayout.LayoutBounds="250,0,100,25"
+                        AbsoluteLayout.LayoutFlags="YProportional"
+                    Command="{Binding ChangeLanguageCommand}"/>
+           
+            <Label Text="User Name"/>            
+            <Entry Text="{Binding UserName}" />            
+            <Label Text="Password"/>
+            <Entry Text="{Binding Password}" IsPassword="True" />
+           
+            <Button Text="Login" Command="{Binding LoginCommand}"
                 VerticalOptions="CenterAndExpand" 
                 HorizontalOptions="CenterAndExpand" />
+            
+            <ActivityIndicator IsRunning="{Binding IsBusy}" 
+                               IsVisible="{Binding IsBusy}"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
