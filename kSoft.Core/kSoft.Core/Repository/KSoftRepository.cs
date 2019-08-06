@@ -1,4 +1,5 @@
 ﻿using kSoft.Core.Contracts.Repository;
+using kSoft.Core.Exceptions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -36,10 +37,44 @@ namespace kSoft.Core.Repository
                     if (response.StatusCode == HttpStatusCode.Forbidden ||
                         response.StatusCode == HttpStatusCode.Unauthorized)
                     {
-                        //throw new ServiceAuthenticationException(jsonResult);
+                        throw new ServiceAuthenticationException(jsonResult);
                     }
 
-                   // throw new HttpRequestExceptionEx(responseMessage.StatusCode, jsonResult);
+                   throw new CustomHttpRequestException(response.StatusCode, jsonResult);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public async Task<T> PostAsync<T>(string uri, T data, string authToken = null)
+        {
+            try
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(data));
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                string jsonResult = string.Empty;
+                
+                using (HttpClient httpClient = CreateHttpClient(authToken))
+                {
+                    var response = await httpClient.PostAsync(uri, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        jsonResult = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                        var json = JsonConvert.DeserializeObject<T>(jsonResult);
+                        return json;
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Forbidden ||
+                        response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new ServiceAuthenticationException(jsonResult);
+                    }
+
+                    throw new CustomHttpRequestException(response.StatusCode, jsonResult);
                 }
             }
             catch (Exception ex)
@@ -47,12 +82,7 @@ namespace kSoft.Core.Repository
                 throw ex;
             }
 
-            throw new NotImplementedException();
-        }
-
-        public Task<T> PostAsync<T>(string uri, T data, string authToken = null)
-        {
-            throw new NotImplementedException();
+           
         }
 
         public Task<R> PostAsync<T, R>(string uri, T data, string authToken = null)
