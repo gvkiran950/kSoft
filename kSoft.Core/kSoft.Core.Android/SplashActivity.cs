@@ -13,11 +13,11 @@ using Android.Widget;
 
 namespace kSoft.Core.Droid
 {
-    [Activity(Label = "kSoft.Core", 
+    [Activity(Label = "kSoft.Core",
         Icon = "@mipmap/icon",
         Theme = "@style/SplashTheme",
-        MainLauncher = true, 
-        NoHistory =true,
+        MainLauncher = true,
+        NoHistory = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class SplashActivity : Activity
     {
@@ -27,12 +27,10 @@ namespace kSoft.Core.Droid
             CallMainActivity();
         }
 
-       private void CallMainActivity()
+        private void CallMainActivity()
         {
-            using (Intent intent = new Intent(this, typeof(MainActivity)))
-            {
-                StartActivity(intent);
-            }
+            Intent intent = new Intent(this, typeof(MainActivity));
+            StartActivity(intent);
         }
     }
 }

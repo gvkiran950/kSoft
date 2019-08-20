@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace kSoft.Core.Services
 {
@@ -13,9 +14,9 @@ namespace kSoft.Core.Services
     {
         private readonly IKSoftRepository _genericRepository;
         
-        public AuthenticationService(IKSoftRepository genericRepository)
-        {           
-            _genericRepository = genericRepository;
+        public AuthenticationService()
+        {
+            _genericRepository = DependencyService.Get <IKSoftRepository>();
         }
         public async Task<AuthenticationResponse> Authenticate(string userName, string password)
         {

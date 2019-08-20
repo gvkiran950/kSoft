@@ -15,6 +15,7 @@ namespace kSoft.Core.Exceptions
 
         public CustomHttpRequestException(HttpStatusCode code, string message) : this(code, message, null)
         {
+            HttpCode = code;
         }
 
         public CustomHttpRequestException(HttpStatusCode code, string message, Exception inner) : base(message, inner)

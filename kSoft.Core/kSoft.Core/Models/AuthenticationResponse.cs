@@ -7,5 +7,6 @@ namespace kSoft.Core.Models
    public class AuthenticationResponse
     {
         public User User { get; set; }
+        public string Token { get; set; }
     }
 }

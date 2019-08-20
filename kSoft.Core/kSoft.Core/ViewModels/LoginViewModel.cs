@@ -1,4 +1,6 @@
-﻿using System;
+﻿using kSoft.Core.Contracts.Services;
+using kSoft.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,7 @@ namespace kSoft.Core.ViewModels
         private string _language = string.Empty;
         private bool _isBusy = false;
 
+        private IAuthenticationService _authenticationService = DependencyService.Get<IAuthenticationService>();
         public Command ChangeLanguageCommand { get; }
         public Command LoginCommand { get; }
         public LoginViewModel()
@@ -50,6 +53,7 @@ namespace kSoft.Core.ViewModels
         async Task Login()
         {
             IsBusy = true;
+            var content = await _authenticationService.Authenticate(_userName, _password);
             await Task.Delay(4000);
             IsBusy = false;
             await Application.Current.MainPage.DisplayAlert("Login", "Login Sucessfull", "Ok");

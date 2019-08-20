@@ -1,4 +1,8 @@
-﻿using kSoft.Core.Views;
+﻿using kSoft.Core.Contracts.Repository;
+using kSoft.Core.Contracts.Services;
+using kSoft.Core.Repository;
+using kSoft.Core.Services;
+using kSoft.Core.Views;
 using Xamarin.Forms;
 namespace kSoft.Core
 {
@@ -7,7 +11,9 @@ namespace kSoft.Core
         public App()
         {
             InitializeComponent();
-           // AppResources.Culture = CrossMultilingual.Current.DeviceCultureInfo;
+            DependencyService.Register<IKSoftRepository, KSoftRepository>();
+            DependencyService.Register<IAuthenticationService, AuthenticationService>();
+            // AppResources.Culture = CrossMultilingual.Current.DeviceCultureInfo;
             MainPage = new LoginPage();
         }
 

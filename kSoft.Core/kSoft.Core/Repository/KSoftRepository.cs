@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Polly;
+using System.Diagnostics;
 
 namespace kSoft.Core.Repository
 {
@@ -25,7 +27,17 @@ namespace kSoft.Core.Repository
                 string jsonResult = string.Empty;
                 using (HttpClient httpClient = CreateHttpClient(authToken))
                 {
-                    var response =  await httpClient.GetAsync(uri);
+                    var response = await Policy
+                        .Handle<WebException>(ex => true)
+                        .WaitAndRetryAsync
+                        (
+                            5,
+                            retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))
+                        )
+                        .ExecuteAsync(async () => await httpClient.GetAsync(uri));
+
+
+                    // await httpClient.GetAsync(uri);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -40,7 +52,7 @@ namespace kSoft.Core.Repository
                         throw new ServiceAuthenticationException(jsonResult);
                     }
 
-                   throw new CustomHttpRequestException(response.StatusCode, jsonResult);
+                    throw new CustomHttpRequestException(response.StatusCode, jsonResult);
                 }
             }
             catch (Exception ex)
@@ -56,10 +68,18 @@ namespace kSoft.Core.Repository
                 var content = new StringContent(JsonConvert.SerializeObject(data));
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 string jsonResult = string.Empty;
-                
+
                 using (HttpClient httpClient = CreateHttpClient(authToken))
                 {
-                    var response = await httpClient.PostAsync(uri, content);
+                    var response = await Policy
+                        .Handle<WebException>(ex => true)
+                        .WaitAndRetryAsync
+                        (
+                            5,
+                            retryAttempts => TimeSpan.FromSeconds(Math.Pow(2, retryAttempts))
+                        )
+                        .ExecuteAsync(async () => await httpClient.PostAsync(uri, content));
+                        
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -82,12 +102,37 @@ namespace kSoft.Core.Repository
                 throw ex;
             }
 
-           
+
         }
 
-        public Task<R> PostAsync<T, R>(string uri, T data, string authToken = null)
+        public async Task<R> PostAsync<T, R>(string uri, T data, string authToken = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                HttpClient httpClient = CreateHttpClient(uri);
+                var content = new StringContent(JsonConvert.SerializeObject(data));
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                string jsonResult = string.Empty;
+                var response = await httpClient.PostAsJsonAsync(uri, data);
+                if (response.IsSuccessStatusCode)
+                {
+                    jsonResult = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    var json = JsonConvert.DeserializeObject<R>(jsonResult);
+                    return json;
+                }
+
+                if (response.StatusCode == HttpStatusCode.Forbidden ||
+                    response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new ServiceAuthenticationException(jsonResult);
+                }
+
+                throw new CustomHttpRequestException(response.StatusCode, jsonResult);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public Task<T> PutAsync<T>(string uri, T data, string authToken = null)
